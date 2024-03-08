@@ -1,7 +1,4 @@
-import { config } from 'dotenv';
 import mongodb from 'mongodb';
-
-config();
 
 class DBClient {
   constructor() {
@@ -19,12 +16,12 @@ class DBClient {
     return this.client.isConnected();
   }
 
-  nbUsers() {
-    const usersCollection = this.client.db().collection('users');
+  async nbUsers() {
+    const usersCollection = await this.client.db().collection('users');
     return usersCollection.countDocuments();
   }
 
-  nbFiles() {
+  async nbFiles() {
     const filesCollection = this.client.db().collection('files');
     return filesCollection.countDocuments();
   }
