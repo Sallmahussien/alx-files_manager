@@ -28,7 +28,7 @@ class DBClient {
 
   async addUser(user) {
     const usersCollection = await this.client.db().collection('users');
-    return await usersCollection.insertOne(user);
+    return usersCollection.insertOne(user);
   }
 
   async getUserByEmail(email) {
