@@ -33,7 +33,7 @@ class DBClient {
 
   async getUserByEmail(email) {
     const usersCollection = await this.client.db().collection('users');
-    return await usersCollection.findOne({ email });
+    return usersCollection.findOne({ email });
   }
 
   async getUserById(id) {
