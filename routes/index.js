@@ -1,9 +1,8 @@
-import AppController from "../controllers/AppController";
-import { Router } from "express";
+import { Router } from 'express';
+import appRouter from './AppRoutes';
 
-const router = Router()
+const router = Router();
 
-router.get('/status', AppController.getStatus);
-router.get('/stats', AppController.getStats);
+router.use('/', appRouter);
 
 export default router;
