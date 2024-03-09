@@ -52,10 +52,33 @@ class DBClient {
     return modifiedData;
   }
 
-  async getFileByParentId(parentId, userId) {
-    const idObject = new ObjectID(parentId);
+  async getFileByIdAndUserId(id, userId) {
     const filesCollection = await this.client.db().collection('files');
-    return filesCollection.findOne({ _id: idObject, userId });
+    const idObject = new ObjectID(id);
+    const userIdObject = new ObjectID(userId);
+    return filesCollection.findOne({ _id: idObject, userId: userIdObject });
+  }
+
+  async getPaginatedFilesByParentId(parentId, userId, page) {
+    const filesCollection = await this.client.db().collection('files');
+    // const parentIdObject = parentId ? new ObjectID(parentId) : 0;
+    const userIdObject = new ObjectID(userId);
+
+    const pageSize = 20;
+    const skip = page * pageSize;
+
+    const pipeline = [
+      { 
+        $match: {
+            parentId: parentId,
+            userId: userIdObject
+        }
+      },
+      { $skip: skip },
+      { $limit: pageSize }
+    ];
+
+    return filesCollection.aggregate(pipeline).toArray();
   }
 }
 
