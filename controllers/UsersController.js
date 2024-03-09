@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import sha1 from 'sha1';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -18,10 +18,7 @@ class UsersController {
         return res.status(400).json({ error: 'Already exist' });
       }
 
-      const hashedPassword = crypto.createHash('sha1');
-      hashedPassword.update(password);
-
-      const user = await dbClient.addUser({ email, password: hashedPassword });
+      const user = await dbClient.addUser({ email, password: sha1(password) });
 
       const { insertedId } = user;
 
