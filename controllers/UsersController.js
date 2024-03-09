@@ -1,6 +1,6 @@
-import sha1 from 'sha1';
+/* eslint-disable import/named */
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
+import { hashPwd } from '../utils/utils';
 
 class UsersController {
   static async postNew(req, res) {
@@ -18,36 +18,20 @@ class UsersController {
         return res.status(400).json({ error: 'Already exist' });
       }
 
-      const user = await dbClient.addUser({ email, password: sha1(password) });
+      const user = await dbClient.addUser({ email, password: hashPwd(password) });
 
       const { insertedId } = user;
 
       return res.status(201).json({ id: insertedId, email });
     } catch (err) {
+      console.error(err);
       return res.status(500).send('Internal server error');
     }
   }
 
   static async getMe(req, res) {
-    const tokenFromHeaders = req.headers['x-token'];
-    const key = `auth_${tokenFromHeaders}`;
-
-    try {
-      const userId = await redisClient.get(key);
-
-      console.log(userId);
-
-      if (!userId) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      const user = await dbClient.getUserById(userId);
-      console.log(user);
-      return res.status(200).json(user);
-    } catch (err) {
-      console.log(err);
-      return res.status(500).send('Internal server error');
-    }
+    const { user } = req;
+    return res.status(200).json(user);
   }
 }
 
