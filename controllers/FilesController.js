@@ -9,21 +9,21 @@ class FilesController {
     const { user } = req;
 
     const userId = user.id;
-    const name = req.body.name;
-    const type = req.body.type;
+    const { name } = req.body;
+    const { type } = req.body;
     const parentId = req.body.parentId || 0;
     const isPublic = req.body.isPublic || false;
-    const data = req.body.data;
+    const { data } = req.body;
     const localPath = process.env.FOLDER_PATH || '/tmp/files_manager/';
 
     if (!name) {
-      return res.status(400).json({ error: "Missing name" });
+      return res.status(400).json({ error: 'Missing name' });
     }
     if (!type) {
-      return res.status(400).json({ error: "Missing type" });
+      return res.status(400).json({ error: 'Missing type' });
     }
     if (!data && type !== 'folder') {
-      return res.status(400).json({ error: "Missing data" });
+      return res.status(400).json({ error: 'Missing data' });
     }
 
     try {
@@ -31,10 +31,10 @@ class FilesController {
         const file = await dbClient.getFileByParentId(parentId, userId);
 
         if (!file) {
-          return res.status(400).json({ error: "Parent not found" });
+          return res.status(400).json({ error: 'Parent not found' });
         }
         if (file.type !== 'folder') {
-          return res.status(400).json({ error: "Parent is not a folder" });
+          return res.status(400).json({ error: 'Parent is not a folder' });
         }
       }
 
@@ -43,8 +43,8 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId
-      }
+        parentId,
+      };
 
       if (type !== 'folder') {
         const fileName = uuidv4();

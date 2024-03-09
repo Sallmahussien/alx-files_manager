@@ -1,10 +1,9 @@
 import sha1 from 'sha1';
 import redisClient from './redis';
 
-const hashPwd = password => sha1(password);
+const hashPwd = (password) => sha1(password);
 
-const getUserCredentials = authHeader => {
-
+const getUserCredentials = (authHeader) => {
   if (!authHeader || !authHeader.startsWith('Basic ')) {
     return null;
   }
@@ -21,7 +20,7 @@ const getUserCredentials = authHeader => {
   }
 
   return { email, password };
-}
+};
 
 const getUserId = async (tokenFromHeaders) => {
   if (!tokenFromHeaders) {
@@ -31,10 +30,10 @@ const getUserId = async (tokenFromHeaders) => {
   const redisKey = `auth_${tokenFromHeaders}`;
   const userId = await redisClient.get(redisKey);
   return userId;
-}
+};
 
 module.exports = {
   hashPwd,
   getUserCredentials,
-  getUserId
+  getUserId,
 };
