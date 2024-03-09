@@ -1,7 +1,8 @@
-import dbClient from '../utils/db';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+
+import dbClient from '../utils/db';
 
 class FilesController {
   static async postUpload(req, res) {
@@ -16,24 +17,24 @@ class FilesController {
     const localPath = process.env.FOLDER_PATH || '/tmp/files_manager/';
 
     if (!name) {
-      res.status(400).json({ error: "Missing name" });
+      return res.status(400).json({ error: "Missing name" });
     }
     if (!type) {
-      res.status(400).json({ error: "Missing type" });
+      return res.status(400).json({ error: "Missing type" });
     }
     if (!data && type !== 'folder') {
-      res.status(400).json({ error: "Missing data" });
+      return res.status(400).json({ error: "Missing data" });
     }
 
     try {
       if (parentId) {
-        const file = await dbClient.getFileByParentId(parentId);
+        const file = await dbClient.getFileByParentId(parentId, userId);
 
         if (!file) {
-          res.status(400).json({ error: "Parent not found" });
+          return res.status(400).json({ error: "Parent not found" });
         }
         if (file.type !== 'folder') {
-          res.status(400).json({ error: "Parent is not a folder" });
+          return res.status(400).json({ error: "Parent is not a folder" });
         }
       }
 
@@ -64,7 +65,6 @@ class FilesController {
       const createdFile = await dbClient.addFile(newFile);
       return res.status(201).json(createdFile);
     } catch (error) {
-      console.error(error);
       return res.status(500).send('Internal server error');
     }
   }
