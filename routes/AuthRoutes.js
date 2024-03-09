@@ -3,7 +3,7 @@ import AuthController from '../controllers/AuthController';
 
 const authRouter = Router();
 
-authRouter.get('/connect', AuthController.connect);
-authRouter.get('/disconnect', AuthController.disconnect);
+authRouter.get('/connect', AuthController.getConnect);
+authRouter.get('/disconnect', AuthController.getDisconnect);
 
 export default authRouter;

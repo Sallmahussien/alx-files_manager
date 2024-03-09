@@ -3,7 +3,7 @@ import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
 class AuthController {
-  static async connect(req, res) {
+  static async getConnect(req, res) {
     const authHeader = req.headers.authorization;
     const base64Credentials = authHeader.split(' ')[1];
     const decodedCredentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
@@ -28,7 +28,7 @@ class AuthController {
     }
   }
 
-  static async disconnect(req, res) {
+  static async getDisconnect(req, res) {
     const tokenFromHeaders = req.headers['x-token'];
     const key = `auth_${tokenFromHeaders}`;
     const userId = redisClient.get(key);

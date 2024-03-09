@@ -31,7 +31,7 @@ class UsersController {
     }
   }
 
-  static async getUser(req, res) {
+  static async getMe(req, res) {
     const tokenFromHeaders = req.headers['x-token'];
     const key = `auth_${tokenFromHeaders}`;
 
