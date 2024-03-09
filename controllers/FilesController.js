@@ -29,7 +29,7 @@ class FilesController {
 
     try {
       if (parentId) {
-        const file = await dbClient.getFileByParentId(parentId, userId);
+        const file = await dbClient.getFileByIdAndUserId(parentId, userId);
 
         if (!file) {
           return res.status(400).json({ error: 'Parent not found' });
@@ -65,6 +65,43 @@ class FilesController {
 
       const createdFile = await dbClient.addFile(newFile);
       return res.status(201).json(createdFile);
+    } catch (error) {
+      return res.status(500).send('Internal server error');
+    }
+  }
+
+  static async getShow(req, res) {
+    const { user } = req;
+
+    const { id } = req.params;
+    const userId = user.id;
+
+    try {
+      const file = await dbClient.getFileByIdAndUserId(id, userId);
+
+      if (!file) {
+        return res.status(400).json({ error: "Not found" });
+      }
+
+      const { _id, ...newFile } = { id: file._id, ...file };
+      return res.status(200).json(newFile);
+    } catch (error) {
+      return res.status(500).send('Internal server error');
+    }
+  }
+
+  static async getIndex(req, res) {
+    const { user } = req;
+
+    const userId = user.id;
+    const parentId = req.query.parentId || 0;
+    const page = req.query.page || 0;
+
+    try {
+      const files = await dbClient.getPaginatedFilesByParentId(parentId, userId, page);
+
+      // const { _id, ...newFiles } = { id: files._id, ...files };
+      return res.status(200).json(files);
     } catch (error) {
       return res.status(500).send('Internal server error');
     }
