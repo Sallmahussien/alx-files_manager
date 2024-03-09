@@ -40,8 +40,8 @@ class DBClient {
     const usersCollection = await this.client.db().collection('users');
     const objectId = new ObjectID(id);
     const user = await usersCollection.findOne({ _id: objectId });
-    const { email, _id } = user;
-    return { _id, email };
+    const { email } = user;
+    return { _id: id, email };
   }
 }
 
