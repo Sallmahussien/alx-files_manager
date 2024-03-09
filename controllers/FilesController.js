@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { ObjectID } from 'mongodb';
 
 import dbClient from '../utils/db';
 
@@ -39,7 +40,7 @@ class FilesController {
       }
 
       const newFile = {
-        userId,
+        userId: new ObjectID(userId),
         name,
         type,
         isPublic,
@@ -48,7 +49,7 @@ class FilesController {
 
       if (type !== 'folder') {
         const fileName = uuidv4();
-        const filePath = !localPath.endsWith('/') ? `${localPath}/${fileName}`: `${localPath}${fileName}`;
+        const filePath = !localPath.endsWith('/') ? `${localPath}/${fileName}` : `${localPath}${fileName}`;
         newFile.localPath = filePath;
         const decodedData = Buffer.from(data, 'base64').toString('utf-8');
 
