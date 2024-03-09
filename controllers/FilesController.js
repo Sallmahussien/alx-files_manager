@@ -44,7 +44,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId: !parentId ? parentId.toString() : new ObjectID(parentId),
+        parentId: !parentId ? parentId.toString() : parentId,
       };
 
       if (type !== 'folder') {
