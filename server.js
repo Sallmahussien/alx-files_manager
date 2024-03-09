@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 import express from 'express';
 import router from './routes';
 
-const PORT = process.env.PORT || '5000';
+const PORT = process.env.PORT || 5000;
 
 config();
 
