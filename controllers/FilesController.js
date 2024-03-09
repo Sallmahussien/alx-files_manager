@@ -64,7 +64,6 @@ class FilesController {
       }
 
       const createdFile = await dbClient.addFile(newFile);
-      console.log(createdFile)
       return res.status(201).json(createdFile);
     } catch (error) {
       return res.status(500).send('Internal server error');
