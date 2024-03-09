@@ -41,7 +41,7 @@ class DBClient {
     const objectId = new ObjectID(id);
     const user = await usersCollection.findOne({ _id: objectId });
     const { email } = user;
-    return { _id: id, email };
+    return { id, email };
   }
 }
 
