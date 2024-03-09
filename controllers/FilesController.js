@@ -47,9 +47,9 @@ class FilesController {
       }
 
       if (type !== 'folder') {
-        newFile.localPath = localPath;
         const fileName = uuidv4();
         const filePath = !localPath.endsWith('/') ? `${localPath}/${fileName}`: `${localPath}${fileName}`;
+        newFile.localPath = filePath;
         const decodedData = Buffer.from(data, 'base64').toString('utf-8');
 
         const directory = path.dirname(filePath);
