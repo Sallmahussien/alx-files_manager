@@ -9,6 +9,6 @@ const router = Router();
 router.use('/', appRouter);
 router.use('/', userRoutes);
 router.use('/', authRouter);
-router.use('/', fileRouter);
+router.use('/files', fileRouter);
 
 export default router;
