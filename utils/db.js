@@ -52,6 +52,12 @@ class DBClient {
     return modifiedData;
   }
 
+  async getFileById(id) {
+    const filesCollection = await this.client.db().collection('files');
+    const idObject = new ObjectID(id);
+    return filesCollection.findOne({ _id: idObject });
+  }
+
   async getFileByIdAndUserId(id, userId) {
     const filesCollection = await this.client.db().collection('files');
     const idObject = new ObjectID(id);
