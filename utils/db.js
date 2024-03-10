@@ -59,23 +59,27 @@ class DBClient {
     return filesCollection.findOne({ _id: idObject, userId: userIdObject });
   }
 
-  async getPaginatedFilesByParentId(parentId, userId, page) {
+  async getPaginatedFiles(userId, parentId, page) {
     const filesCollection = await this.client.db().collection('files');
-    // const parentIdObject = parentId ? new ObjectID(parentId) : 0;
     const userIdObject = new ObjectID(userId);
 
     const pageSize = 20;
     const skip = page * pageSize;
 
+    const matchStage = {
+      userId: userIdObject,
+    };
+
+    if (parentId) {
+      matchStage.parentId = parentId;
+    }
+
     const pipeline = [
-      { 
-        $match: {
-            parentId: parentId,
-            userId: userIdObject
-        }
+      {
+        $match: matchStage,
       },
       { $skip: skip },
-      { $limit: pageSize }
+      { $limit: pageSize },
     ];
 
     return filesCollection.aggregate(pipeline).toArray();
