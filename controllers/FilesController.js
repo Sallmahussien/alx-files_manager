@@ -94,8 +94,8 @@ class FilesController {
     const { user } = req;
 
     const userId = user.id;
-    const parentId = parseInt(req.query.page) || 0;
-    const page = req.query.page || 0;
+    const parentId = req.query.parentId || 0;
+    const page = parseInt(req.query.page, 10) || 0;
 
     try {
       const files = await dbClient.getPaginatedFiles(userId, parentId, page);
