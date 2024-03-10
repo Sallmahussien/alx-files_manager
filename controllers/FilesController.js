@@ -80,7 +80,7 @@ class FilesController {
       const file = await dbClient.getFileByIdAndUserId(id, userId);
 
       if (!file) {
-        return res.status(400).json({ error: "Not found" });
+        return res.status(400).json({ error: 'Not found' });
       }
 
       const { _id, ...newFile } = { id: file._id, ...file };
@@ -98,10 +98,13 @@ class FilesController {
     const page = req.query.page || 0;
 
     try {
-      const files = await dbClient.getPaginatedFilesByParentId(parentId, userId, page);
+      const files = await dbClient.getPaginatedFiles(userId, parentId, page);
 
-      // const { _id, ...newFiles } = { id: files._id, ...files };
-      return res.status(200).json(files);
+      const modifiedData = files.map((file) => {
+        const { _id, ...rest } = file;
+        return { id: _id, ...rest };
+      });
+      return res.status(200).json(modifiedData);
     } catch (error) {
       return res.status(500).send('Internal server error');
     }
