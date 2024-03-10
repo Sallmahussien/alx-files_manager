@@ -109,6 +109,34 @@ class FilesController {
       return res.status(500).send('Internal server error');
     }
   }
+
+  static async putFilePublish(req, res, isPublic) {
+    const { user } = req;
+    const userId = user.id;
+    const { id } = req.params;
+
+    try {
+      const file = await dbClient.updateFileIsPublic(id, userId, isPublic);
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      const { _id, ...rest } = file;
+      const modifiedFile = { id: _id, ...rest };
+
+      return res.status(200).json(modifiedFile);
+    } catch (error) {
+      return res.status(500).send('Internal server error');
+    }
+  }
+
+  static async putPublish(req, res) {
+    return FilesController.putFilePublish(req, res, true);
+  }
+
+  static async putUnpublish(req, res) {
+    return FilesController.putFilePublish(req, res, false);
+  }
 }
 
 export default FilesController;
