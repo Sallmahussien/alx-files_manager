@@ -11,7 +11,7 @@ import dbClient from '../utils/db';
 
 const readFileAsync = util.promisify(fs.readFile);
 
-const ROOT_PARENT_ID = 0;
+const ROOT_PARENT_ID = '0';
 
 class FilesController {
   static async postUpload(req, res) {
@@ -78,7 +78,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId,
+        parentId: parentId === ROOT_PARENT_ID ? 0 : parentId,
       });
     } catch (error) {
       return res.status(500).send('Internal server error');
@@ -104,7 +104,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId === ROOT_PARENT_ID ? ROOT_PARENT_ID : file.parentId.toString(),
+        parentId: file.parentId.toString() === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
       });
     } catch (error) {
       return res.status(500).send('Internal server error');
@@ -127,7 +127,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId === ROOT_PARENT_ID ? ROOT_PARENT_ID : file.parentId.toString(),
+        parentId: file.parentId.toString() === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
       }));
 
       return res.status(200).json(modifiedData);
