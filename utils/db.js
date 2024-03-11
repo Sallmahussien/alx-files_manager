@@ -67,7 +67,7 @@ class DBClient {
   async getPaginatedFiles(userId, parentId, page) {
     const filesCollection = await this.client.db().collection('files');
     const userIdObject = new ObjectID(userId);
-    const parentIdObject = parentId  ? new ObjectID(parentId) : null;
+    // const parentIdObject = parentId  ? new ObjectID(parentId) : null;
 
     const pageSize = 20;
     const skip = page * pageSize;
@@ -76,8 +76,8 @@ class DBClient {
       userId: userIdObject,
     };
 
-    if (parentIdObject) {
-      matchStage.parentId = parentIdObject;
+    if (parentId) {
+      matchStage.parentId = parentId;
     }
 
     const pipeline = [
