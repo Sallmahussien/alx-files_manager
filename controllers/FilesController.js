@@ -104,7 +104,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
+        parentId: file.parentId.toString() === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
       });
     } catch (error) {
       return res.status(500).send('Internal server error');
@@ -127,7 +127,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
+        parentId: parentId === ROOT_PARENT_ID ? 0 : parentId,
       }));
 
       return res.status(200).json(modifiedData);
