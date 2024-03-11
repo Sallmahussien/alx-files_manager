@@ -53,7 +53,7 @@ class DBClient {
       }) => ({
         id: _id,
         ...rest,
-        parentId: parentId === '0' ? 0 : parentId,
+        parentId,
       }))[0];
 
     return modifiedData;
@@ -75,7 +75,7 @@ class DBClient {
   async getPaginatedFiles(userId, parentId, page) {
     const filesCollection = await this.client.db().collection('files');
     const userIdObject = new ObjectID(userId);
-    const parentIdObject = parentId ? new ObjectID(parentId) : '0';
+    const parentIdObject = parentId ? new ObjectID(parentId) : parentId;
 
     const pageSize = 20;
     const skip = page * pageSize;
@@ -84,7 +84,7 @@ class DBClient {
       userId: userIdObject,
     };
 
-    if (parentIdObject !== '0') {
+    if (parentIdObject) {
       matchStage.parentId = parentIdObject;
     }
 

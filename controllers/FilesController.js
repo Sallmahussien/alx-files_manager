@@ -113,7 +113,7 @@ class FilesController {
         return {
           id: _id,
           ...rest,
-          parentId: parentId === '0' ? 0 : parentId,
+          parentId
         };
       });
       return res.status(200).json(modifiedData);
