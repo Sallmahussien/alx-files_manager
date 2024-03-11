@@ -4,17 +4,16 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { ObjectId } from 'mongodb';
 import mime from 'mime-types';
-import util from 'util';
 import Bull from 'bull';
+import { promisify } from 'util';
 import { getUserId } from '../utils/utils';
 
 import dbClient from '../utils/db';
 
-const readFileAsync = util.promisify(fs.readFile);
-
 const fileImageQueue = new Bull('fileQueue');
 
-const ROOT_PARENT_ID = '0';
+const ROOT_PARENT_ID = 0;
+
 
 class FilesController {
   static async postUpload(req, res) {
@@ -158,10 +157,14 @@ class FilesController {
         return res.status(404).json({ error: 'Not found' });
       }
 
-      const { _id, ...rest } = file;
-      const modifiedFile = { id: _id, ...rest };
-
-      return res.status(200).json(modifiedFile);
+      return res.status(200).json({
+        id: file._id.toString(),
+        userId: file.userId.toString(),
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId === ROOT_PARENT_ID ? ROOT_PARENT_ID : file.parentId.toString(),
+      });
     } catch (error) {
       return res.status(500).send('Internal server error');
     }
@@ -211,7 +214,8 @@ class FilesController {
         return res.status(404).json({ error: 'Not found' });
       }
 
-      const data = await readFileAsync(fileLocalPath, 'utf8');
+      const readFileAsync = promisify(fs.readFile);
+      const data = await readFileAsync(fileLocalPath);
 
       res.setHeader('Content-Type', fileMimeType);
       return res.status(200).send(data);
