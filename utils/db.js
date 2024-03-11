@@ -47,16 +47,8 @@ class DBClient {
   async addFile(file) {
     const filesCollection = await this.client.db().collection('files');
     const newFile = await filesCollection.insertOne(file);
-    const modifiedData = newFile.ops
-      .map(({
-        _id, localPath, parentId, ...rest
-      }) => ({
-        id: _id,
-        ...rest,
-        parentId,
-      }))[0];
 
-    return modifiedData;
+    return newFile;
   }
 
   async getFileById(id) {

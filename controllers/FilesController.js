@@ -11,22 +11,24 @@ import dbClient from '../utils/db';
 
 const readFileAsync = util.promisify(fs.readFile);
 
+const ROOT_PARENT_ID = '0';
+
 class FilesController {
   static async postUpload(req, res) {
     const { user } = req;
 
     const userId = user.id;
-    const { name } = req.body;
-    const { type } = req.body;
-    const parentId = req.body.parentId || 0;
+    const { name, type, data } = req.body;
+    const parentId = req.body.parentId || ROOT_PARENT_ID;
     const isPublic = req.body.isPublic || false;
-    const { data } = req.body;
     const localPath = process.env.FOLDER_PATH || '/tmp/files_manager/';
+
+    const validFileTypes = ['folder', 'file', 'image'];
 
     if (!name) {
       return res.status(400).json({ error: 'Missing name' });
     }
-    if (!type || !['folder', 'file', 'image'].includes(type)) {
+    if (!type || !validFileTypes.includes(type)) {
       return res.status(400).json({ error: 'Missing type' });
     }
     if (!data && type !== 'folder') {
@@ -34,7 +36,7 @@ class FilesController {
     }
 
     try {
-      if (parentId) {
+      if (parentId !== ROOT_PARENT_ID) {
         const file = await dbClient.getFileByIdAndUserId(parentId, userId);
 
         if (!file) {
@@ -50,7 +52,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId: parentId ? new ObjectID(parentId) : '0',
+        parentId: parentId !== ROOT_PARENT_ID ? new ObjectID(parentId) : parentId,
       };
 
       if (type !== 'folder') {
@@ -70,7 +72,14 @@ class FilesController {
       }
 
       const createdFile = await dbClient.addFile(newFile);
-      return res.status(201).json(createdFile);
+      return res.status(201).json({
+        id: createdFile.insertedId,
+        userId,
+        name,
+        type,
+        isPublic,
+        parentId
+      });
     } catch (error) {
       return res.status(500).send('Internal server error');
     }
