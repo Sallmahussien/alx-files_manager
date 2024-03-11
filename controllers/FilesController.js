@@ -14,7 +14,6 @@ const fileImageQueue = new Bull('fileQueue');
 
 const ROOT_PARENT_ID = 0;
 
-
 class FilesController {
   static async postUpload(req, res) {
     const { user } = req;
@@ -76,7 +75,7 @@ class FilesController {
       const createdFile = await dbClient.addFile(newFile);
 
       if (createdFile.type === 'image') {
-        const job = await fileImageQueue.add({
+        await fileImageQueue.add({
           userId,
           fileId: createdFile.id,
         });
@@ -114,7 +113,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId.toString() === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
+        parentId: file.parentId === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
       });
     } catch (error) {
       return res.status(500).send('Internal server error');
@@ -137,7 +136,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId.toString() === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
+        parentId: file.parentId === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
       }));
 
       return res.status(200).json(modifiedData);
