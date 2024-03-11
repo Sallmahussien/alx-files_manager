@@ -72,7 +72,7 @@ class DBClient {
 
     const matchStage = {
       userId: userIdObject,
-      parentIdObject
+      parentId: parentIdObject
     };
 
     // if (parentIdObject) {
