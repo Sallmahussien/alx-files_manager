@@ -1,12 +1,14 @@
 import fs from 'fs';
 import Bull from 'bull';
-import dbClient from './utils/db';
 import imageThumbnail from 'image-thumbnail';
+import { promisify } from 'util';
+import path from 'path';
+import dbClient from './utils/db';
 
 const fileImageQueue = new Bull('fileQueue');
 
 fileImageQueue.process(async (job) => {
-  console.log('processing')
+  console.log('processing');
   const { fileId, userId } = job.data;
   if (!fileId) {
     throw new Error('Missing fileId');
@@ -23,28 +25,26 @@ fileImageQueue.process(async (job) => {
     }
 
     const widths = [500, 200, 100];
-    // for (const width of widths) {
-    //   const options = { width };
-    //   const filePath = file.localPath;
-    //   const thumbnail = await imageThumbnail(filePath, options);
+    const readFileAsync = promisify(fs.readFile);
+    const writeFileAsync = promisify(fs.writeFile);
 
-    //   fs.writeFile(filePath.replace('.', `_${width}.`), thumbnail, (err) => {
-    //     if (err) throw err;
-    //   });
-    // }
     const promises = widths.map(async (width) => {
       const options = { width };
       const filePath = file.localPath;
+      const newFilePath = `${path.dirname(filePath)}/${file.name}`;
+
+      const data = await readFileAsync(filePath);
+      await writeFileAsync(newFilePath, data);
+
       console.log(filePath);
-      const thumbnail = await imageThumbnail(filePath, options);
-      const thumbnailPath = filePath.replace('.', `_${width}.`);
-      console.log(thumbnailPath)
-      await fs.writeFile(thumbnailPath, thumbnail);
+      const thumbnail = await imageThumbnail(newFilePath, options);
+      const thumbnailPath = newFilePath.replace('.', `_${width}.`);
+      console.log(thumbnailPath);
+      await writeFileAsync(thumbnailPath, thumbnail);
     });
 
     await Promise.all(promises);
   } catch (err) {
     console.error(err);
   }
-
 });
