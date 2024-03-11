@@ -78,7 +78,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId
+        parentId: parentId === ROOT_PARENT_ID ? 0 : parentId
       });
     } catch (error) {
       return res.status(500).send('Internal server error');
