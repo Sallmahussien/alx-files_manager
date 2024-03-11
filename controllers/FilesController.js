@@ -183,6 +183,7 @@ class FilesController {
         return res.status(400).json({ error: "A folder doesn't have content" });
       }
 
+      const fileLocalPath = file.localPath;
       if (!fs.existsSync(fileLocalPath)) {
         return res.status(404).json({ error: 'Not found' });
       }
