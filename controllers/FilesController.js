@@ -50,7 +50,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId,
+        parentId: parentId ? new ObjectID(parentId) : '0',
       };
 
       if (type !== 'folder') {
@@ -89,7 +89,7 @@ class FilesController {
         return res.status(400).json({ error: 'Not found' });
       }
 
-      const { _id, ...newFile } = { id: file._id, ...file };
+      const { _id, localPath, ...newFile } = { id: file._id, ...file };
       return res.status(200).json(newFile);
     } catch (error) {
       return res.status(500).send('Internal server error');
@@ -107,8 +107,14 @@ class FilesController {
       const files = await dbClient.getPaginatedFiles(userId, parentId, page);
 
       const modifiedData = files.map((file) => {
-        const { _id, ...rest } = file;
-        return { id: _id, ...rest };
+        const {
+          _id, localPath, parentId, ...rest
+        } = file;
+        return {
+          id: _id,
+          ...rest,
+          parentId: parentId === '0' ? 0 : parentId,
+        };
       });
       return res.status(200).json(modifiedData);
     } catch (error) {
@@ -151,30 +157,24 @@ class FilesController {
     try {
       const file = await dbClient.getFileById(fileId);
       if (!file) {
-        console.log('1');
         return res.status(404).json({ error: 'Not found' });
       }
 
       const userId = await getUserId(tokenFromHeaders);
       if (!file.isPublic && (!userId || file.userId.toString() !== userId)) {
-        console.log('2');
         return res.status(404).json({ error: 'Not found' });
       }
 
       if (file.type === 'folder') {
-        console.log('3');
         return res.status(400).json({ error: "A folder doesn't have content" });
       }
 
-      const fileLocalPath = file.localPath;
       if (!fs.existsSync(fileLocalPath)) {
-        console.log('4');
         return res.status(404).json({ error: 'Not found' });
       }
 
       const fileMimeType = mime.lookup(file.name);
       if (!fileMimeType) {
-        console.log('5');
         return res.status(404).json({ error: 'Not found' });
       }
 

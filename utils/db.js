@@ -48,7 +48,14 @@ class DBClient {
     const filesCollection = await this.client.db().collection('files');
     const newFile = await filesCollection.insertOne(file);
     const modifiedData = newFile.ops
-      .map(({ _id, localPath, ...rest }) => ({ id: _id, ...rest }))[0];
+      .map(({
+        _id, localPath, parentId, ...rest
+      }) => ({
+        id: _id,
+        ...rest,
+        parentId: parentId === '0' ? 0 : parentId,
+      }))[0];
+
     return modifiedData;
   }
 
@@ -68,6 +75,7 @@ class DBClient {
   async getPaginatedFiles(userId, parentId, page) {
     const filesCollection = await this.client.db().collection('files');
     const userIdObject = new ObjectID(userId);
+    const parentIdObject = parentId ? new ObjectID(parentId) : '0';
 
     const pageSize = 20;
     const skip = page * pageSize;
@@ -76,8 +84,8 @@ class DBClient {
       userId: userIdObject,
     };
 
-    if (parentId) {
-      matchStage.parentId = parentId;
+    if (parentIdObject !== '0') {
+      matchStage.parentId = parentIdObject;
     }
 
     const pipeline = [
