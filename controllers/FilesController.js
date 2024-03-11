@@ -5,11 +5,14 @@ import path from 'path';
 import { ObjectId } from 'mongodb';
 import mime from 'mime-types';
 import util from 'util';
+import Bull from 'bull';
 import { getUserId } from '../utils/utils';
 
 import dbClient from '../utils/db';
 
 const readFileAsync = util.promisify(fs.readFile);
+
+const fileImageQueue = new Bull('fileQueue');
 
 const ROOT_PARENT_ID = '0';
 
@@ -72,6 +75,14 @@ class FilesController {
       }
 
       const createdFile = await dbClient.addFile(newFile);
+
+      if (createdFile.type === 'image') {
+        const job = await fileImageQueue.add({
+          userId,
+          fileId: createdFile.id,
+        });
+      }
+
       return res.status(201).json({
         id: createdFile.insertedId,
         userId,
@@ -167,6 +178,7 @@ class FilesController {
   static async getFile(req, res) {
     const fileId = req.params.id;
     const tokenFromHeaders = req.headers['x-token'];
+    const { size } = req.query;
 
     try {
       const file = await dbClient.getFileById(fileId);
@@ -181,6 +193,13 @@ class FilesController {
 
       if (file.type === 'folder') {
         return res.status(400).json({ error: "A folder doesn't have content" });
+      }
+
+      let fileLocalPath;
+      if (size && file.type === 'image') {
+        fileLocalPath = file.localPath.replace('.', `_${size}.`);
+      } else {
+        fileLocalPath = file.localPath;
       }
 
       if (!fs.existsSync(fileLocalPath)) {
