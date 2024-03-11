@@ -78,7 +78,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId: parentId === ROOT_PARENT_ID ? 0 : parentId
+        parentId: parentId === ROOT_PARENT_ID ? 0 : parentId,
       });
     } catch (error) {
       return res.status(500).send('Internal server error');
@@ -98,8 +98,14 @@ class FilesController {
         return res.status(400).json({ error: 'Not found' });
       }
 
-      const { _id, localPath, ...newFile } = { id: file._id, ...file };
-      return res.status(200).json(newFile);
+      return res.status(200).json({
+        id,
+        userId,
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
+      });
     } catch (error) {
       return res.status(500).send('Internal server error');
     }
@@ -109,22 +115,21 @@ class FilesController {
     const { user } = req;
 
     const userId = user.id;
-    const parentId = req.query.parentId || 0;
+    const parentId = req.query.parentId || ROOT_PARENT_ID;
     const page = parseInt(req.query.page, 10) || 0;
 
     try {
       const files = await dbClient.getPaginatedFiles(userId, parentId, page);
 
-      const modifiedData = files.map((file) => {
-        const {
-          _id, localPath, parentId, ...rest
-        } = file;
-        return {
-          id: _id,
-          ...rest,
-          parentId
-        };
-      });
+      const modifiedData = files.map((file) => ({
+        id: file._id.toString(),
+        userId: file.userId.toString(),
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId === ROOT_PARENT_ID ? 0 : file.parentId.toString(),
+      }));
+
       return res.status(200).json(modifiedData);
     } catch (error) {
       return res.status(500).send('Internal server error');
