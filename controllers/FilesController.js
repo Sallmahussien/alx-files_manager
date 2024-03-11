@@ -2,7 +2,7 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import mime from 'mime-types';
 import util from 'util';
 import { getUserId } from '../utils/utils';
@@ -48,11 +48,11 @@ class FilesController {
       }
 
       const newFile = {
-        userId: new ObjectID(userId),
+        userId: ObjectId(userId),
         name,
         type,
         isPublic,
-        parentId: parentId !== ROOT_PARENT_ID ? new ObjectID(parentId) : parentId,
+        parentId: parentId !== ROOT_PARENT_ID ? ObjectId(parentId) : parentId,
       };
 
       if (type !== 'folder') {

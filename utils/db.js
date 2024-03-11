@@ -1,4 +1,4 @@
-import mongodb, { ObjectID } from 'mongodb';
+import mongodb, { ObjectId } from 'mongodb';
 
 class DBClient {
   constructor() {
@@ -38,7 +38,7 @@ class DBClient {
 
   async getUserById(id) {
     const usersCollection = await this.client.db().collection('users');
-    const objectId = new ObjectID(id);
+    const objectId = ObjectId(id);
     const user = await usersCollection.findOne({ _id: objectId });
     const { email } = user;
     return { id, email };
@@ -53,21 +53,21 @@ class DBClient {
 
   async getFileById(id) {
     const filesCollection = await this.client.db().collection('files');
-    const idObject = new ObjectID(id);
+    const idObject = ObjectId(id);
     return filesCollection.findOne({ _id: idObject });
   }
 
   async getFileByIdAndUserId(id, userId) {
     const filesCollection = await this.client.db().collection('files');
-    const idObject = new ObjectID(id);
-    const userIdObject = new ObjectID(userId);
+    const idObject = ObjectId(id);
+    const userIdObject = ObjectId(userId);
     return filesCollection.findOne({ _id: idObject, userId: userIdObject });
   }
 
   async getPaginatedFiles(userId, parentId, page) {
     const filesCollection = await this.client.db().collection('files');
-    const userIdObject = new ObjectID(userId);
-    const parentIdObject = parentId  ? new ObjectID(parentId) : null;
+    const userIdObject = ObjectId(userId);
+    const parentIdObject = parentId  ? ObjectId(parentId) : null;
 
     const pageSize = 20;
     const skip = page * pageSize;
@@ -94,8 +94,8 @@ class DBClient {
 
   async updateFileIsPublic(id, userId, state) {
     const filesCollection = await this.client.db().collection('files');
-    const idObject = new ObjectID(id);
-    const userIdObject = new ObjectID(userId);
+    const idObject = ObjectId(id);
+    const userIdObject = ObjectId(userId);
 
     const updatedFile = await filesCollection.findOneAndUpdate(
       { _id: idObject, userId: userIdObject },
