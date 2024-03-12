@@ -145,8 +145,8 @@ class FilesController {
     }
   }
 
-  static async putFilePublish(req, res, isPublic) {
-    const { user } = req;
+  static async putFilePublish(req, res) {
+    const { user, isPublic } = req;
     const userId = user.id;
     const { id } = req.params;
 
@@ -156,9 +156,11 @@ class FilesController {
         return res.status(404).json({ error: 'Not found' });
       }
 
+      console.log(file);
+
       return res.status(200).json({
-        id: file._id.toString(),
-        userId: file.userId.toString(),
+        id,
+        userId,
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
@@ -169,12 +171,15 @@ class FilesController {
     }
   }
 
-  static async putPublish(req, res) {
-    return FilesController.putFilePublish(req, res, true);
+  static async putPublish(req, res, next) {
+    req.isPublic = true;
+    return next();
   }
 
-  static async putUnpublish(req, res) {
-    return FilesController.putFilePublish(req, res, false);
+  static async putUnpublish(req, res, next) {
+    req.isPublic = false;
+    return next();
+    // return FilesController.putFilePublish(req, res, false);
   }
 
   static async getFile(req, res) {

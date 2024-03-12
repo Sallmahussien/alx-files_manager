@@ -46,7 +46,7 @@ class DBClient {
 
   async addFile(file) {
     const filesCollection = await this.client.db().collection('files');
-    return await filesCollection.insertOne(file);
+    return filesCollection.insertOne(file);
   }
 
   async getFileById(id) {
@@ -65,7 +65,7 @@ class DBClient {
   async getPaginatedFiles(userId, parentId, page) {
     const filesCollection = await this.client.db().collection('files');
     const userIdObject = ObjectId(userId);
-    const parentIdObject = !parentId  ? ObjectId(parentId) : null;
+    const parentIdObject = !parentId ? ObjectId(parentId) : null;
 
     const pageSize = 20;
     const skip = page * pageSize;
