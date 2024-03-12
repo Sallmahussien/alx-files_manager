@@ -3,7 +3,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { ObjectId } from 'mongodb';
-import mime from 'mime-types';
+import { contentType } from 'mime-types';
 import Bull from 'bull';
 import { promisify } from 'util';
 import { getUserId } from '../utils/utils';
@@ -197,21 +197,13 @@ class FilesController {
         return res.status(400).json({ error: "A folder doesn't have content" });
       }
 
-      let fileLocalPath;
-      if (size && file.type === 'image') {
-        fileLocalPath = file.localPath.replace('.', `_${size}.`);
-      } else {
-        fileLocalPath = file.localPath;
-      }
+      const fileLocalPath = (size && file.type === 'image') ? `${file.localPath}_${size}` : file.localPath;
 
       if (!fs.existsSync(fileLocalPath)) {
         return res.status(404).json({ error: 'Not found' });
       }
 
-      const fileMimeType = mime.lookup(file.name);
-      if (!fileMimeType) {
-        return res.status(404).json({ error: 'Not found' });
-      }
+      const fileMimeType = contentType(file.name) || 'text/plain; charset=utf-8';
 
       const readFileAsync = promisify(fs.readFile);
       const data = await readFileAsync(fileLocalPath);
